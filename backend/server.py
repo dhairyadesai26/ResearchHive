@@ -11,9 +11,14 @@ import json
 import uuid
 import asyncio
 import base64
+import os
 from datetime import datetime
 from pipeline import run_research_pipeline_stream
-from prisma import Prisma
+
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+from database.session import get_db, async_session_maker
+from database.models import ResearchRun
 
 def get_user_id(authorization: str = Header(None, alias="Authorization"), token: str = None):
     print(f"DEBUG AUTH: received authorization header: '{authorization}', token param: '{token}'")
@@ -45,15 +50,11 @@ def get_user_id(authorization: str = Header(None, alias="Authorization"), token:
         print(f"DEBUG AUTH: Exception during decode: {e}")
         raise HTTPException(status_code=401, detail=f"Invalid token encoding: {str(e)}")
 
-db = Prisma()
-
 app = FastAPI(
     title="ResearchHive",
     description="Autonomous research powered by LangChain + Mistral AI",
     version="1.0.0",
 )
-
-import os
 
 origins = [
     "http://localhost:5173", 
@@ -78,18 +79,6 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-async def startup():
-    print("Fetching Prisma binaries just in case...")
-    os.system("prisma py fetch")
-    await db.connect()
-
-@app.on_event("shutdown")
-async def shutdown():
-    if db.is_connected():
-        await db.disconnect()
-
-
 class ResearchRequest(BaseModel):
     topic: str = Field(..., min_length=1, max_length=500, description="The research topic")
 
@@ -107,19 +96,20 @@ def health_check():
 
 
 @app.post("/api/research", response_model=ResearchResponse)
-async def start_research(request: ResearchRequest, user_id: str = Depends(get_user_id)):
+async def start_research(request: ResearchRequest, user_id: str = Depends(get_user_id), db: AsyncSession = Depends(get_db)):
     """Start a new research pipeline run."""
     run_id = str(uuid.uuid4())[:8]
     
-    run_record = await db.researchrun.create(
-        data={
-            "runId": run_id,
-            "userId": user_id,
-            "topic": request.topic,
-            "status": "pending",
-            "results": "{}"
-        }
+    run_record = ResearchRun(
+        runId=run_id,
+        userId=user_id,
+        topic=request.topic,
+        status="pending",
+        results={}
     )
+    db.add(run_record)
+    await db.commit()
+    await db.refresh(run_record)
 
     return ResearchResponse(
         run_id=run_id,
@@ -130,9 +120,11 @@ async def start_research(request: ResearchRequest, user_id: str = Depends(get_us
 
 
 @app.get("/api/research/{run_id}/stream")
-async def stream_research(run_id: str, user_id: str = Depends(get_user_id)):
+async def stream_research(run_id: str, user_id: str = Depends(get_user_id), db: AsyncSession = Depends(get_db)):
     """Stream research pipeline progress via Server-Sent Events."""
-    run_record = await db.researchrun.find_unique(where={"runId": run_id})
+    result = await db.execute(select(ResearchRun).where(ResearchRun.runId == run_id))
+    run_record = result.scalars().first()
+
     if not run_record or run_record.userId != user_id:
         raise HTTPException(status_code=404, detail="Research run not found")
 
@@ -142,46 +134,53 @@ async def stream_research(run_id: str, user_id: str = Depends(get_user_id)):
     topic = run_record.topic
 
     async def event_generator():
-        try:
-            await db.researchrun.update(
-                where={"runId": run_id},
-                data={"status": "running"}
-            )
+        async with async_session_maker() as session:
+            try:
+                await session.execute(
+                    update(ResearchRun)
+                    .where(ResearchRun.runId == run_id)
+                    .values(status="running")
+                )
+                await session.commit()
 
-            # Send start event
-            yield f"data: {json.dumps({'type': 'start', 'topic': topic, 'run_id': run_id})}\n\n"
+                # Send start event
+                yield f"data: {json.dumps({'type': 'start', 'topic': topic, 'run_id': run_id})}\n\n"
 
-            # Run the pipeline with streaming
-            loop = asyncio.get_event_loop()
-            results = {}
+                # Run the pipeline with streaming
+                loop = asyncio.get_event_loop()
+                results = {}
 
-            for event in await loop.run_in_executor(None, lambda: list(run_research_pipeline_stream(topic))):
-                yield f"data: {json.dumps(event)}\n\n"
+                for event in await loop.run_in_executor(None, lambda: list(run_research_pipeline_stream(topic))):
+                    yield f"data: {json.dumps(event)}\n\n"
 
-                # Store results as they come
-                if event["type"] == "step_result":
-                    results[event["step"]] = event.get("content", "")
-                elif event["type"] == "report":
-                    results["report"] = event.get("content", "")
-                elif event["type"] == "feedback":
-                    results["feedback"] = event.get("content", "")
+                    # Store results as they come
+                    if event["type"] == "step_result":
+                        results[event["step"]] = event.get("content", "")
+                    elif event["type"] == "report":
+                        results["report"] = event.get("content", "")
+                    elif event["type"] == "feedback":
+                        results["feedback"] = event.get("content", "")
 
-            await db.researchrun.update(
-                where={"runId": run_id},
-                data={
-                    "status": "completed", 
-                    "results": json.dumps(results)
-                }
-            )
+                await session.execute(
+                    update(ResearchRun)
+                    .where(ResearchRun.runId == run_id)
+                    .values(
+                        status="completed", 
+                        results=results
+                    )
+                )
+                await session.commit()
 
-            yield f"data: {json.dumps({'type': 'complete', 'run_id': run_id})}\n\n"
+                yield f"data: {json.dumps({'type': 'complete', 'run_id': run_id})}\n\n"
 
-        except Exception as e:
-            await db.researchrun.update(
-                where={"runId": run_id},
-                data={"status": "error"}
-            )
-            yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
+            except Exception as e:
+                await session.execute(
+                    update(ResearchRun)
+                    .where(ResearchRun.runId == run_id)
+                    .values(status="error")
+                )
+                await session.commit()
+                yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
 
     return StreamingResponse(
         event_generator(),
@@ -195,12 +194,14 @@ async def stream_research(run_id: str, user_id: str = Depends(get_user_id)):
 
 
 @app.get("/api/research")
-async def list_research(user_id: str = Depends(get_user_id)):
+async def list_research(user_id: str = Depends(get_user_id), db: AsyncSession = Depends(get_db)):
     """List all research runs for the user."""
-    runs = await db.researchrun.find_many(
-        where={"userId": user_id},
-        order={"createdAt": "desc"}
+    result = await db.execute(
+        select(ResearchRun)
+        .where(ResearchRun.userId == user_id)
+        .order_by(ResearchRun.createdAt.desc())
     )
+    runs = result.scalars().all()
     
     formatted_runs = []
     for run in runs:
@@ -215,18 +216,15 @@ async def list_research(user_id: str = Depends(get_user_id)):
 
 
 @app.get("/api/research/{run_id}")
-async def get_research(run_id: str, user_id: str = Depends(get_user_id)):
+async def get_research(run_id: str, user_id: str = Depends(get_user_id), db: AsyncSession = Depends(get_db)):
     """Get results of a completed research run."""
-    run_record = await db.researchrun.find_unique(where={"runId": run_id})
+    result = await db.execute(select(ResearchRun).where(ResearchRun.runId == run_id))
+    run_record = result.scalars().first()
+
     if not run_record or run_record.userId != user_id:
         raise HTTPException(status_code=404, detail="Research run not found")
         
-    results_dict = {}
-    if run_record.results:
-        try:
-            results_dict = json.loads(run_record.results) if isinstance(run_record.results, str) else run_record.results
-        except Exception:
-            results_dict = {}
+    results_dict = run_record.results if run_record.results else {}
 
     return {
         "run_id": run_record.runId,
@@ -238,13 +236,17 @@ async def get_research(run_id: str, user_id: str = Depends(get_user_id)):
 
 
 @app.delete("/api/research/{run_id}")
-async def delete_research(run_id: str, user_id: str = Depends(get_user_id)):
+async def delete_research(run_id: str, user_id: str = Depends(get_user_id), db: AsyncSession = Depends(get_db)):
     """Delete a research run from history."""
-    run_record = await db.researchrun.find_unique(where={"runId": run_id})
+    result = await db.execute(select(ResearchRun).where(ResearchRun.runId == run_id))
+    run_record = result.scalars().first()
+
     if not run_record or run_record.userId != user_id:
         raise HTTPException(status_code=404, detail="Research run not found")
         
-    await db.researchrun.delete(where={"runId": run_id})
+    await db.execute(delete(ResearchRun).where(ResearchRun.runId == run_id))
+    await db.commit()
+    
     return {"status": "success", "message": "Research deleted"}
 
 

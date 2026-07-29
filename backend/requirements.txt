@@ -35,8 +35,10 @@ fastapi
 uvicorn
 
 # Database
-prisma
-sqlalchemy
+SQLAlchemy>=2.0.0
+alembic
+asyncpg
+greenlet
 
 # Logging & Utilities
 rich
