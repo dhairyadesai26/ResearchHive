@@ -66,13 +66,14 @@ origins = [
 
 frontend_url = os.getenv("FRONTEND_URL")
 if frontend_url:
-    # Handle multiple frontend URLs if comma-separated
-    origins.extend([url.strip() for url in frontend_url.split(",")])
+    # Handle multiple frontend URLs if comma-separated, and strip any accidental trailing slashes
+    origins.extend([url.strip().rstrip("/") for url in frontend_url.split(",")])
 
 # CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
