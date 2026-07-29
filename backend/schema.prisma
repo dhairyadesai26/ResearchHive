@@ -1,0 +1,22 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+}
+
+model ResearchRun {
+  id         String   @id @default(uuid())
+  runId      String   @unique
+  userId     String   // NEW: For user isolation
+  topic      String
+  status     String
+  results    Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

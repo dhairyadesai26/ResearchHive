@@ -1,0 +1,82 @@
+# Core AI Framework
+langchain
+langgraph
+langsmith
+langchain-core
+langchain-community
+
+# LLM Providers
+langchain-openai
+langchain-groq
+langchain-mistralai
+langchain-google-genai
+openai
+groq
+mistralai
+google-generativeai
+
+# Environment Variables
+python-dotenv
+
+# HTTP Requests
+requests
+httpx
+
+# Search Tools
+tavily-python
+duckduckgo-search
+
+# Vector Databases
+chromadb
+faiss-cpu
+
+# Embeddings
+sentence-transformers
+
+# Hugging Face
+transformers
+huggingface-hub
+
+# Tokenizers
+tiktoken
+
+# Data Handling
+numpy
+pandas
+
+# Document Loaders
+pypdf
+pymupdf
+unstructured
+python-docx
+
+# RAG Utilities
+rank-bm25
+
+# Async Support
+aiohttp
+
+# FastAPI (if deploying)
+fastapi
+uvicorn
+
+# Database
+sqlalchemy
+
+# Logging & Utilities
+rich
+tenacity
+
+# JSON Validation
+pydantic
+
+# Optional Memory
+redis
+
+# Optional Graph Visualization
+networkx
+matplotlib
+
+# Optional Jupyter
+ipykernel
+jupyter
