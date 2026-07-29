@@ -61,6 +61,7 @@ fastapi
 uvicorn
 
 # Database
+prisma
 sqlalchemy
 
 # Logging & Utilities
