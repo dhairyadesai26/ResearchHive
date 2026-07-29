@@ -3,6 +3,9 @@
 # 🧠 ResearchHive
 **An Autonomous, Multi-Agent AI Research Pipeline**
 
+[![Deploy](https://img.shields.io/badge/Live_Demo-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://research-hive.vercel.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dhairyadesai26/ResearchHive)
+
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](#)
 [![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)](#)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](#)
@@ -72,7 +75,7 @@ The core of ResearchHive is an autonomous pipeline where agents pass state seque
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/ResearchHive.git
+git clone https://github.com/dhairyadesai26/ResearchHive.git
 cd ResearchHive
 ```
 
@@ -112,5 +115,6 @@ If you are evaluating this project, take note of the following engineering decis
 
 ---
 <div align="center">
-<i>Built by Dhairya Desai</i>
+<i>Built by Dhairya Desai</i><br>
+<a href="https://research-hive.vercel.app/">Live Demo</a> • <a href="https://github.com/dhairyadesai26/ResearchHive">GitHub Repository</a>
 </div>
