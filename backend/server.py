@@ -80,6 +80,8 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
+    print("Fetching Prisma binaries just in case...")
+    os.system("prisma py fetch")
     await db.connect()
 
 @app.on_event("shutdown")
