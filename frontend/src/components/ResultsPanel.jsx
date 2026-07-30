@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 
 function renderMarkdown(text) {
   if (!text) return '';
+  if (typeof text !== 'string') {
+    text = JSON.stringify(text, null, 2);
+  }
 
   let html = text
     .replace(/^### (.*$)/gm, '<h3>$1</h3>')
@@ -29,6 +32,9 @@ function renderMarkdown(text) {
 
 function extractUrls(text) {
   if (!text) return [];
+  if (typeof text !== 'string') {
+    text = JSON.stringify(text);
+  }
   const urlRegex = /https?:\/\/[^\s\)\"<>]+/g;
   const matches = text.match(urlRegex) || [];
   return [...new Set(matches)];
@@ -36,6 +42,9 @@ function extractUrls(text) {
 
 function parseFeedback(text) {
   if (!text) return { score: null, strengths: [], improvements: [], verdict: '' };
+  if (typeof text !== 'string') {
+    text = JSON.stringify(text);
+  }
 
   const scoreMatch = text.match(/Score:\s*(\d+)\/10/i);
   const score = scoreMatch ? parseInt(scoreMatch[1]) : null;

@@ -73,9 +73,30 @@ function TimelineStep({ agent, stepData, index, isLast }) {
                   </div>
                 )}
                 {stepData.content && (
-                  <div className="timeline-result">
-                    {stepData.content}
-                  </div>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="timeline-result"
+                    style={{
+                      marginTop: '0.75rem',
+                      padding: '1rem',
+                      backgroundColor: 'rgba(0,0,0,0.4)',
+                      borderRadius: '0.5rem',
+                      border: '1px solid var(--border-color)',
+                      fontFamily: 'monospace',
+                      fontSize: '0.85rem',
+                      color: 'var(--text-secondary)',
+                      maxHeight: '200px',
+                      overflowY: 'auto',
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
+                      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+                    }}
+                  >
+                    {typeof stepData.content === 'string' 
+                      ? stepData.content 
+                      : JSON.stringify(stepData.content, null, 2)}
+                  </motion.div>
                 )}
                 {isError && stepData.message && (
                   <div className="timeline-error-text">

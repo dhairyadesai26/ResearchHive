@@ -27,7 +27,7 @@ export default function Footer() {
             </p>
             <button
               className="btn btn-secondary btn-sm"
-              onClick={() => window.open('https://github.com', '_blank')}
+              onClick={() => window.open('https://github.com/dhairyadesai26/ResearchHive.git', '_blank')}
             >
               <Code2 size={14} />
               GitHub

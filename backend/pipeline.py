@@ -21,7 +21,8 @@ def run_research_pipeline_stream(topic: str):
         search_result = search_agent.invoke({
             "messages": [("user", f"Find recent, reliable and detailed information about: {topic}")]
         })
-        state["search_results"] = search_result['messages'][-1].content
+        content = search_result['messages'][-1].content
+        state["search_results"] = content if isinstance(content, str) else str(content)
         yield {"type": "step_result", "step": "search", "content": state["search_results"][:500]}
     except Exception as e:
         yield {"type": "error", "step": "search", "message": f"Search agent failed: {str(e)}"}
@@ -39,7 +40,8 @@ def run_research_pipeline_stream(topic: str):
                 f"Search Results:\n{state['search_results'][:800]}"
             )]
         })
-        state['scraped_content'] = reader_result['messages'][-1].content
+        content = reader_result['messages'][-1].content
+        state['scraped_content'] = content if isinstance(content, str) else str(content)
         yield {"type": "step_result", "step": "reader", "content": state['scraped_content'][:500]}
     except Exception as e:
         yield {"type": "error", "step": "reader", "message": f"Reader agent failed: {str(e)}"}
@@ -57,6 +59,8 @@ def run_research_pipeline_stream(topic: str):
             "topic": topic,
             "research": research_combined
         })
+        if not isinstance(state["report"], str):
+            state["report"] = str(state["report"])
         yield {"type": "step_result", "step": "writer", "content": state["report"][:300]}
         yield {"type": "report", "content": state["report"]}
     except Exception as e:
@@ -70,6 +74,8 @@ def run_research_pipeline_stream(topic: str):
         state["feedback"] = critic_chain.invoke({
             "report": state['report']
         })
+        if not isinstance(state["feedback"], str):
+            state["feedback"] = str(state["feedback"])
         yield {"type": "step_result", "step": "critic", "content": state["feedback"][:300]}
         yield {"type": "feedback", "content": state["feedback"]}
     except Exception as e:
