@@ -4,12 +4,8 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const STEP_ORDER = ['search', 'reader', 'writer', 'critic'];
 
-/**
- * Custom hook managing the entire research workflow.
- * Handles: POST to start, SSE to stream, state updates.
- */
 export function useResearch(session) {
-  const [status, setStatus] = useState('idle'); // idle | running | completed | error
+  const [status, setStatus] = useState('idle');
   const [currentStep, setCurrentStep] = useState(null);
   const [steps, setSteps] = useState({
     search:  { status: 'waiting', title: 'Search Agent',  message: '', content: '' },
@@ -45,7 +41,6 @@ export function useResearch(session) {
     setStatus('running');
 
     try {
-      // Step 1: POST to start research
       const response = await fetch(`${API_BASE}/api/research`, {
         method: 'POST',
         headers: { 
@@ -63,22 +58,12 @@ export function useResearch(session) {
             errorMessage += ` - ${errData.detail}`;
           }
         } catch (e) {
-          // ignore json parse error
         }
         throw new Error(errorMessage);
       }
 
       const { run_id } = await response.json();
 
-      // Step 2: Connect to SSE stream
-      // We can't send headers easily in EventSource, so we append token to URL if needed
-      // Actually, standard EventSource doesn't support headers.
-      // Wait, EventSource doesn't support custom headers! 
-      // I need to use fetch or pass it in query params, but our backend expects Header.
-      // Oh no, FastAPI backend expects `Header(None)`.
-      // Let's pass it as a URL parameter in the frontend and update backend to accept query param?
-      // For now, let's use fetch polyfill or EventSource with query.
-      // Let's just pass it in URL query and update backend.
       const eventSource = new EventSource(`${API_BASE}/api/research/${run_id}/stream?token=${session?.access_token}`);
       eventSourceRef.current = eventSource;
 
@@ -193,7 +178,7 @@ export function useResearch(session) {
     }
     
     resetState();
-    setStatus('running'); // Temporary loading state
+    setStatus('running');
     
     try {
       const response = await fetch(`${API_BASE}/api/research/${runId}`, {
@@ -238,7 +223,7 @@ export function useResearch(session) {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       });
       if (response.ok) {
-        await fetchHistory(); // refresh the list
+        await fetchHistory();
       }
     } catch (err) {
       console.error('Failed to delete history item:', err);

@@ -18,7 +18,6 @@ export default function LandingPage({ onLogin, theme, toggleTheme }) {
 
   return (
     <div className="landing-root">
-      {/* Premium Navbar for Landing */}
       <nav className="landing-nav">
         <div className="landing-nav-inner">
           <div className="landing-logo">
@@ -35,7 +34,6 @@ export default function LandingPage({ onLogin, theme, toggleTheme }) {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <section className="landing-hero">
         <div className="landing-hero-bg">
           <div className="glow-orb orb-1"></div>
@@ -69,7 +67,6 @@ export default function LandingPage({ onLogin, theme, toggleTheme }) {
             </button>
           </motion.div>
 
-          {/* Abstract visualization of the pipeline */}
           <motion.div variants={itemVariants} className="landing-visual">
             <div className="visual-agent agent-search"><Search size={24} /></div>
             <div className="visual-line"></div>
@@ -82,7 +79,6 @@ export default function LandingPage({ onLogin, theme, toggleTheme }) {
         </motion.div>
       </section>
 
-      {/* Features Grid */}
       <section className="landing-features">
         <div className="landing-features-header">
           <h2>Four Specialised AI Agents</h2>

@@ -2,18 +2,8 @@ from agents import build_reader_agent , build_search_agent , writer_chain , crit
 
 
 def run_research_pipeline_stream(topic: str):
-    """
-    Generator version of run_research_pipeline that yields structured events
-    for real-time streaming via SSE.
-    
-    Yields dicts with:
-      - type: 'step_start' | 'step_result' | 'report' | 'feedback'
-      - step: step name
-      - content: output content
-    """
     state = {}
 
-    # Step 1 — Search Agent
     yield {"type": "step_start", "step": "search", "title": "Search Agent", "message": "Searching the web for relevant information..."}
 
     try:
@@ -28,7 +18,6 @@ def run_research_pipeline_stream(topic: str):
         yield {"type": "error", "step": "search", "message": f"Search agent failed: {str(e)}"}
         return
 
-    # Step 2 — Reader Agent
     yield {"type": "step_start", "step": "reader", "title": "Reader Agent", "message": "Scraping top resources for deeper content..."}
 
     try:
@@ -47,7 +36,6 @@ def run_research_pipeline_stream(topic: str):
         yield {"type": "error", "step": "reader", "message": f"Reader agent failed: {str(e)}"}
         return
 
-    # Step 3 — Writer Agent
     yield {"type": "step_start", "step": "writer", "title": "Writer Agent", "message": "Drafting the research report..."}
 
     try:
@@ -67,7 +55,6 @@ def run_research_pipeline_stream(topic: str):
         yield {"type": "error", "step": "writer", "message": f"Writer agent failed: {str(e)}"}
         return
 
-    # Step 4 — Critic Agent
     yield {"type": "step_start", "step": "critic", "title": "Critic Agent", "message": "Reviewing and scoring the report..."}
 
     try:
@@ -87,7 +74,6 @@ def run_research_pipeline(topic : str) -> dict:
 
     state = {}
 
-    #search agent working 
     print("\n"+" ="*50)
     print("step 1 - search agent is working ...")
     print("="*50)
@@ -100,7 +86,6 @@ def run_research_pipeline(topic : str) -> dict:
 
     print("\n search result ",state['search_results'])
 
-    #step 2 - reader agent 
     print("\n"+" ="*50)
     print("step 2 - Reader agent is scraping top resources ...")
     print("="*50)
@@ -118,7 +103,6 @@ def run_research_pipeline(topic : str) -> dict:
 
     print("\nscraped content: \n", state['scraped_content'])
 
-    #step 3 - writer chain 
 
     print("\n"+" ="*50)
     print("step 3 - Writer is drafting the report ...")
@@ -136,7 +120,6 @@ def run_research_pipeline(topic : str) -> dict:
 
     print("\n Final Report\n",state['report'])
 
-    #critic report 
 
     print("\n"+" ="*50)
     print("step 4 - critic is reviewing the report ")

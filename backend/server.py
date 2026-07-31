@@ -1,7 +1,3 @@
-"""
-FastAPI server for the Multi-Agent AI Research Pipeline.
-Exposes the research pipeline as an API with Server-Sent Events streaming.
-"""
 
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,7 +18,6 @@ from database.models import ResearchRun
 
 def get_user_id(authorization: str = Header(None, alias="Authorization"), token: str = None):
     print(f"DEBUG AUTH: received authorization header: '{authorization}', token param: '{token}'")
-    # Try header first, then query parameter (for EventSource)
     if authorization and authorization.lower().startswith("bearer "):
         token = authorization.split(" ")[1]
         
@@ -66,10 +61,8 @@ origins = [
 
 frontend_url = os.getenv("FRONTEND_URL")
 if frontend_url:
-    # Handle multiple frontend URLs if comma-separated, and strip any accidental trailing slashes
     origins.extend([url.strip().rstrip("/") for url in frontend_url.split(",")])
 
-# CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -98,7 +91,6 @@ def health_check():
 
 @app.post("/api/research", response_model=ResearchResponse)
 async def start_research(request: ResearchRequest, user_id: str = Depends(get_user_id), db: AsyncSession = Depends(get_db)):
-    """Start a new research pipeline run."""
     run_id = str(uuid.uuid4())[:8]
     
     run_record = ResearchRun(
@@ -122,7 +114,6 @@ async def start_research(request: ResearchRequest, user_id: str = Depends(get_us
 
 @app.get("/api/research/{run_id}/stream")
 async def stream_research(run_id: str, user_id: str = Depends(get_user_id), db: AsyncSession = Depends(get_db)):
-    """Stream research pipeline progress via Server-Sent Events."""
     result = await db.execute(select(ResearchRun).where(ResearchRun.runId == run_id))
     run_record = result.scalars().first()
 
@@ -144,17 +135,14 @@ async def stream_research(run_id: str, user_id: str = Depends(get_user_id), db: 
                 )
                 await session.commit()
 
-                # Send start event
                 yield f"data: {json.dumps({'type': 'start', 'topic': topic, 'run_id': run_id})}\n\n"
 
-                # Run the pipeline with streaming
                 loop = asyncio.get_event_loop()
                 results = {}
 
                 for event in await loop.run_in_executor(None, lambda: list(run_research_pipeline_stream(topic))):
                     yield f"data: {json.dumps(event)}\n\n"
 
-                    # Store results as they come
                     if event["type"] == "step_result":
                         results[event["step"]] = event.get("content", "")
                     elif event["type"] == "report":
@@ -196,7 +184,6 @@ async def stream_research(run_id: str, user_id: str = Depends(get_user_id), db: 
 
 @app.get("/api/research")
 async def list_research(user_id: str = Depends(get_user_id), db: AsyncSession = Depends(get_db)):
-    """List all research runs for the user."""
     result = await db.execute(
         select(ResearchRun)
         .where(ResearchRun.userId == user_id)
@@ -218,7 +205,6 @@ async def list_research(user_id: str = Depends(get_user_id), db: AsyncSession = 
 
 @app.get("/api/research/{run_id}")
 async def get_research(run_id: str, user_id: str = Depends(get_user_id), db: AsyncSession = Depends(get_db)):
-    """Get results of a completed research run."""
     result = await db.execute(select(ResearchRun).where(ResearchRun.runId == run_id))
     run_record = result.scalars().first()
 
@@ -238,7 +224,6 @@ async def get_research(run_id: str, user_id: str = Depends(get_user_id), db: Asy
 
 @app.delete("/api/research/{run_id}")
 async def delete_research(run_id: str, user_id: str = Depends(get_user_id), db: AsyncSession = Depends(get_db)):
-    """Delete a research run from history."""
     result = await db.execute(select(ResearchRun).where(ResearchRun.runId == run_id))
     run_record = result.scalars().first()
 

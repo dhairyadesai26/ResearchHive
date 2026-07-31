@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, History, CheckCircle, Clock, AlertCircle, Trash2 } from 'lucide-react';
 
 export default function HistorySidebar({ isOpen, onClose, history, fetchHistory, onLoadPastResearch, onDeleteHistoryItem }) {
-  // Fetch history when sidebar opens
   useEffect(() => {
     if (isOpen) {
       fetchHistory();

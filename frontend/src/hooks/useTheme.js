@@ -1,14 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 
-/**
- * Theme hook with localStorage persistence.
- * Applies data-theme="light" or data-theme="dark" to <html>.
- */
 export function useTheme() {
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('researchhive-theme');
     if (saved === 'light' || saved === 'dark') return saved;
-    // Default to dark
     return 'dark';
   });
 

@@ -11,23 +11,21 @@ export default function ParticleCanvas() {
     let animationFrameId;
     let particles = [];
     
-    // Aurora color palette (Dark Mode)
     const AURORA_COLORS = [
-      'rgba(0, 229, 160, 0.35)',   // emerald
-      'rgba(0, 180, 216, 0.3)',     // teal
-      'rgba(123, 47, 247, 0.25)',   // violet
-      'rgba(240, 192, 64, 0.2)',    // gold
-      'rgba(0, 229, 160, 0.2)',     // emerald dim
-      'rgba(0, 180, 216, 0.15)',    // teal dim
+      'rgba(0, 229, 160, 0.35)',
+      'rgba(0, 180, 216, 0.3)',
+      'rgba(123, 47, 247, 0.25)',
+      'rgba(240, 192, 64, 0.2)',
+      'rgba(0, 229, 160, 0.2)',
+      'rgba(0, 180, 216, 0.15)',
     ];
 
-    // Prism color palette (Light Mode)
     const PRISM_COLORS = [
-      'rgba(59, 130, 246, 0.35)',   // blue
-      'rgba(217, 70, 239, 0.3)',    // fuchsia
-      'rgba(139, 92, 246, 0.25)',   // violet
-      'rgba(59, 130, 246, 0.2)',    // blue dim
-      'rgba(217, 70, 239, 0.15)',   // fuchsia dim
+      'rgba(59, 130, 246, 0.35)',
+      'rgba(217, 70, 239, 0.3)',
+      'rgba(139, 92, 246, 0.25)',
+      'rgba(59, 130, 246, 0.2)',
+      'rgba(217, 70, 239, 0.15)',
     ];
 
     const getColors = () => {
@@ -49,7 +47,6 @@ export default function ParticleCanvas() {
         this.size = Math.random() * 1.8 + 0.2;
         this.speedX = Math.random() * 0.4 - 0.2;
         this.speedY = Math.random() * 0.4 - 0.2;
-        // Keep an index to dynamically fetch the right color for the current theme
         this.colorIndex = Math.floor(Math.random() * 5);
         this.opacity = Math.random() * 0.6 + 0.2;
         this.pulseSpeed = Math.random() * 0.01 + 0.005;
@@ -60,7 +57,6 @@ export default function ParticleCanvas() {
         this.x += this.speedX;
         this.y += this.speedY;
 
-        // Gentle pulse effect
         this.opacity = 0.2 + Math.sin(time * this.pulseSpeed + this.pulseOffset) * 0.15;
 
         if (this.x > canvas.width) this.x = 0;
@@ -102,7 +98,6 @@ export default function ParticleCanvas() {
         particles[i].update(time);
         particles[i].draw(currentColors);
         
-        // Connecting lines
         for (let j = i; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
@@ -138,7 +133,6 @@ export default function ParticleCanvas() {
 
     window.addEventListener('resize', resize);
     
-    // Observer for theme changes to trigger instant redraws or logic if needed
     const observer = new MutationObserver(() => {});
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 

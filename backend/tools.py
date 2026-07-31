@@ -9,12 +9,10 @@ load_dotenv()
 
 
 
-#search tool
 tavily=TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
 @tool
 def web_search(query:str)->str:
-    """ Search the web for recent and reliable inflormation on a topic.Returns titls,url's and snippets"""
     results=tavily.search(query=query,max_results=5)
     out=[]
     for r in results['results']:
@@ -25,7 +23,6 @@ def web_search(query:str)->str:
 
 
 def scrape_url(url:str)->str:
-    """Scrape the content of a webpage and return the text."""
     try:
         response=requests.get(url,headers={"User-Agent":"Mozilla/5.0"})
         soup=BeautifulSoup(response.text,'html.parser')

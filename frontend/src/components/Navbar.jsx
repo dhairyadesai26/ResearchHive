@@ -40,7 +40,6 @@ export default function Navbar({ onOpenHistory, onNewResearch, onLogout, theme, 
     <>
       <nav className={cn('navbar', isScrolled && 'navbar-scrolled')}>
         <div className="navbar-inner">
-          {/* LEFT: Logo */}
           <div className="navbar-left">
             <button onClick={() => scrollTo('hero')} className="navbar-logo">
               <img src="/logo-dark.png" alt="ResearchHive Logo" className="navbar-logo-image" style={{ width: '2rem', height: '2rem', borderRadius: 'var(--radius-sm)' }} />
@@ -50,7 +49,6 @@ export default function Navbar({ onOpenHistory, onNewResearch, onLogout, theme, 
             </button>
           </div>
 
-          {/* CENTER: Tabs */}
           <div className="navbar-center">
             {NAV_ITEMS.map((item) => (
               <button
@@ -63,7 +61,6 @@ export default function Navbar({ onOpenHistory, onNewResearch, onLogout, theme, 
             ))}
           </div>
 
-          {/* RIGHT: Actions */}
           <div className="navbar-right">
             <button onClick={toggleTheme} className="navbar-link" style={{ display: 'flex', alignItems: 'center', padding: '0.4rem', borderRadius: '50%' }} aria-label="Toggle theme">
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
