@@ -35,6 +35,9 @@ export default function ResearchInput({ onSubmit, status, onCancel }) {
             Start Your Research
           </h2>
           <p>Enter any topic and our AI agents will research it for you in real-time.</p>
+          <div style={{ padding: '12px', background: 'rgba(255, 50, 50, 0.1)', color: '#ff6b6b', border: '1px solid rgba(255, 107, 107, 0.3)', borderRadius: '8px', marginTop: '16px', fontSize: '14px', fontWeight: '500' }}>
+            ⚠️ <strong>Notice:</strong> This project is currently unavailable as the free tier API limits have been exhausted.
+          </div>
         </motion.div>
 
         <motion.form
