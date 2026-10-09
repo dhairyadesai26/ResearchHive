@@ -23,7 +23,7 @@ export default function Hero() {
           className="hero-badge"
         >
           <span className="hero-badge-dot" />
-          <span>Powered by LangChain + Mistral AI</span>
+          <span>Powered by LangChain + Gemini</span>
         </motion.div>
 
         <motion.h1

@@ -22,7 +22,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="footer-brand-desc">
-              An autonomous multi-agent research pipeline powered by LangChain and Mistral AI.
+              An autonomous multi-agent research pipeline powered by LangChain and Gemini.
               Four agents work together to deliver production-grade research reports.
             </p>
             <button
@@ -53,7 +53,7 @@ export default function Footer() {
           <div>
             <h4 className="footer-col-title">Powered By</h4>
             <ul className="footer-links">
-              {['LangChain', 'Mistral AI', 'Tavily Search', 'FastAPI', 'React + Vite', 'Python'].map((tech) => (
+              {['LangChain', 'Gemini', 'Tavily Search', 'FastAPI', 'React + Vite', 'Python'].map((tech) => (
                 <li key={tech} className="footer-tech-item">
                   {tech}
                 </li>

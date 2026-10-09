@@ -47,7 +47,7 @@ def get_user_id(authorization: str = Header(None, alias="Authorization"), token:
 
 app = FastAPI(
     title="ResearchHive",
-    description="Autonomous research powered by LangChain + Mistral AI",
+    description="Autonomous research powered by LangChain + Gemini",
     version="1.0.0",
 )
 

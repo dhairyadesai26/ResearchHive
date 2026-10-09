@@ -8,7 +8,7 @@ models = [
     "meta-llama/Meta-Llama-3-8B-Instruct",
     "meta-llama/Llama-3.1-8B-Instruct",
     "Qwen/Qwen2.5-Coder-32B-Instruct",
-    "mistralai/Mistral-7B-Instruct-v0.3"
+    "google/gemma-1.1-7b-it"
 ]
 
 for m in models:

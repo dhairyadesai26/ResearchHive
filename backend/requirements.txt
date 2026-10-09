@@ -8,11 +8,9 @@ langchain-community
 # LLM Providers
 langchain-openai
 langchain-groq
-langchain-mistralai
 langchain-google-genai
 openai
 groq
-mistralai
 google-generativeai
 
 # Environment Variables

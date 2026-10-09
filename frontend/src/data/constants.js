@@ -34,7 +34,7 @@ export const PIPELINE_AGENTS = [
     icon: PenTool,
     color: 'pink',
     description: 'Synthesizes research into a structured, professional report with introduction, key findings, and sources.',
-    tools: ['Mistral AI', 'LangChain'],
+    tools: ['Gemini', 'LangChain'],
   },
   {
     id: 'critic',
@@ -43,7 +43,7 @@ export const PIPELINE_AGENTS = [
     icon: ShieldCheck,
     color: 'emerald',
     description: 'Reviews and scores the report on a 10-point scale, identifying strengths and areas for improvement.',
-    tools: ['Mistral AI', 'LangChain'],
+    tools: ['Gemini', 'LangChain'],
   },
 ];
 
@@ -69,7 +69,7 @@ export const TECH_STACK = [
     category: 'LLM Providers',
     icon: Cpu,
     items: [
-      { name: 'Mistral AI' },
+      { name: 'Gemini' },
     ],
   },
   {

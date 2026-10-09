@@ -20,7 +20,7 @@
 
 ## 🚀 Overview
 
-**ResearchHive** is an advanced AI research platform designed to automate the heavy lifting of internet research. Built on a modern, decoupled architecture, it leverages a specialized team of **LangChain AI Agents** powered by **Mistral AI** to mimic the workflow of a human researcher. 
+**ResearchHive** is an advanced AI research platform designed to automate the heavy lifting of internet research. Built on a modern, decoupled architecture, it leverages a specialized team of **LangChain AI Agents** powered by **Gemini** to mimic the workflow of a human researcher. 
 
 Instead of waiting for a single long response, users watch the AI think in real-time. The backend utilizes **Server-Sent Events (SSE)** to stream live pipeline updates, agent thoughts, and final markdown reports directly to a stunning, glassmorphic React interface.
 
@@ -48,7 +48,7 @@ Instead of waiting for a single long response, users watch the AI think in real-
 
 ### Backend (API & Agent Layer)
 - **Framework**: FastAPI (Python)
-- **AI/LLM Engine**: LangChain + Mistral AI (`mistral-small-2506`)
+- **AI/LLM Engine**: LangChain + Gemini (`gemini-2.5-flash`)
 - **Tools**: Tavily (Semantic Web Search), BeautifulSoup4 (Web Scraping)
 - **Database ORM**: SQLAlchemy 2.0 (Async)
 - **Migrations**: Alembic
